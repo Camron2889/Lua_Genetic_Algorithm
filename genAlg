@@ -1,0 +1,28 @@
+local genAlg = {
+    --Default Parameters
+    populationSize: 40,
+    
+    genomeSize: 3,
+    geneDomain: { -1, 2 }, -- { x, width }
+    
+    mutationType: "gaussian", --options: gaussian, shrink 
+    mutationRate: 1, --min: 0, max: 1
+    mutationShrink: 0.5 --min: 0, max: 1
+    
+    selectionType: "boltzmann", --options: uniform, boltzmann 
+    selectionRate: 0.2, --min: 0, max: 1
+    selectionShrink: 0.8, --min: 0, max: 1
+    
+    crossoverType: "uniform", --options: uniform
+}
+
+function genAlg._gaussian (mean, variance)
+    return  math.sqrt(-2 * variance * math.log(math.random())) *
+            math.cos(2 * math.pi * math.random()) + mean
+end
+
+function genAlg.newRun()
+    genAlg.run = {}
+end
+
+ga.part = 
