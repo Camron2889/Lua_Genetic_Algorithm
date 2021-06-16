@@ -11,7 +11,7 @@ local genAlg = {
     mutationShrink = 0.5 --min: 0, max: 1
     
     selectionType = "uniform", --options: uniform, boltzmann 
-    selectionGradient = true,
+    selectionStochastic = true,
     selectionCarryOver = 1, --how many of the best performers are carried over without modification
     selectionRate = 0.2, --min: 0, max: 1
     selectionShrink = 0.8, --min: 0, max: 1
@@ -38,6 +38,7 @@ function genAlg.run()
         genAlg._sortPopulation(data.population)
         
         --select creatures
+        local parents = {}
         for creatureNum = 1, genAlg.populationSize, 1 do
             local creature = data.population[creatureNum]
             
