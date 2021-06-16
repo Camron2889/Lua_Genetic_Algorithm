@@ -10,7 +10,8 @@ local genAlg = {
     mutationRate = 1, --min: 0, max: 1
     mutationShrink = 0.5 --min: 0, max: 1
     
-    selectionType = "boltzmann", --options: uniform, boltzmann 
+    selectionType = "uniform", --options: uniform, boltzmann 
+    selectionGradient = true,
     selectionCarryOver = 1, --how many of the best performers are carried over without modification
     selectionRate = 0.2, --min: 0, max: 1
     selectionShrink = 0.8, --min: 0, max: 1
@@ -24,9 +25,23 @@ function genAlg.run()
     local data = {
         topScores = {},
         population = genAlg._randomPopulaton(),
-    }
-    for i = 1, genAlg.generations, 1 do
         
+    }
+    for genNum = 1, genAlg.generations, 1 do
+        --rank creatures
+        for creatureNum = 1, genAlg.populationSize, 1 do
+            local creature = data.population[creatureNum]
+            creature.score = genAlg.fitnessFunction(creature.genes)
+        end
+        
+        --sort creatures
+        genAlg._sortPopulation(data.population)
+        
+        --select creatures
+        for creatureNum = 1, genAlg.populationSize, 1 do
+            local creature = data.population[creatureNum]
+            
+        end
     end
 end
 
@@ -38,11 +53,11 @@ end
 function genAlg._randomPopulaton()
     local population = {}
     for i = 1, genAlg.populationSize, 1 do
-        local dna = {}
+        local _dna = {}
         for j = 1, genAlg.genomeSize, 1 do
             dna[j] = math.random() * genAlg.geneDomain[2] + genAlg.geneDomain[1]
         end
-        population[i] = dna
+        population[i] = { genes = dna, score = 0 }
     end
     return population
 end
