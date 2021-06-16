@@ -20,9 +20,6 @@ local genAlg = {
     fitnessFunction = nil,
 }
 
-function genAlg._gaussian (mean, variance)
-    return  math.sqrt(-2 * variance * math.log(math.random())) *
-            math.cos(2 * math.pi * math.random()) + mean
 genAlg.setRewardFunction()
 
 function genAlg.run()
@@ -37,5 +34,8 @@ end
 
 function genAlg.newRun()
     genAlg.run = {}
+function genAlg._gaussian(mean, variance)
+    return  math.sqrt(-2 * variance * math.log(math.random())) *
+            math.cos(2 * math.pi * math.random()) + mean
 end
 
