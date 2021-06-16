@@ -6,6 +6,7 @@ function LinkedList:new()
     self.__index = self
     
     instance.head = nil
+    instance.currentNode = nil
     instance.previousNode = nil
     instance.length = 0
     
@@ -83,7 +84,6 @@ function LinkedList:removeHere()
             self.currentNode = previous
             current.nextNode = nil
             self.previousNode = nil
-
         else --case: { _ -> O -> _ }
             self.head = nil
             self.currentNode = nil
@@ -109,7 +109,7 @@ function LinkedList:find(value)
 end
     
 function LinkedList:toArray()
-    if (not self:begin()) then return nil end
+    if (not self:begin()) then return {} end
     local arr = { self.currentNode.value }
     while self:next() do
         arr.push(self.currentNode.value)
@@ -118,7 +118,7 @@ function LinkedList:toArray()
 end
 
 function LinkedList:toString()
-    if (not self:begin()) then return nil end
+    if (not self:begin()) then return "{}" end
     local str = "{ "..self.currentNode.value
     while self:next() do
         str = str..", "..self.currentNode.value
