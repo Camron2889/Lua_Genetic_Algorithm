@@ -39,3 +39,14 @@ function genAlg._gaussian(mean, variance)
             math.cos(2 * math.pi * math.random()) + mean
 end
 
+function genAlg._randomPopulaton()
+    local population = {}
+    for i = 1, genAlg.populationSize, 1 do
+        local dna = {}
+        for j = 1, genAlg.genomeSize, 1 do
+            dna[j] = math.random() * genAlg.geneDomain[2] + genAlg.geneDomain[1]
+        end
+        population[i] = dna
+    end
+    return population
+end
