@@ -9,12 +9,12 @@ local genAlg = {
     mutationType = "gaussian", --options: gaussian, shrink 
     mutationRate = 1, --min: 0, max: 1
     mutationStdDev = 1,
-    mutationShrink = 0.5 --min: 0, max: 1
+    mutationShrink = 0.8 --min: 0, max: 1
     
-    selectionType = "gaussian", --options: uniform, linear, gaussian, boltzmann 
-    selectionIsStochastic = true,
+    selectionType = "rank", "shrink" --options: rank, shrink
+    selectionDistribution = "gaussian", --options: none, triangular, gaussian
     selectionCarryover = 1, --how many of the best performers are carried over without modification
-    selectionRate = 0.2, --min: 0, max: 1           boltzmann(init, shrinkrate)
+    selectionRate = 0.2, --min: 0, max: 1
     selectionStdDev = 0.2, --min: 0, max: 1
     selectionShrink = 0.8, --min: 0, max: 1
     
