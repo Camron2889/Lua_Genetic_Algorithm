@@ -8,12 +8,14 @@ local genAlg = {
     
     mutationType = "gaussian", --options: gaussian, shrink 
     mutationRate = 1, --min: 0, max: 1
+    mutationStdDev = 1,
     mutationShrink = 0.5 --min: 0, max: 1
     
-    selectionType = "uniform", --options: uniform, boltzmann 
-    selectionStochastic = true,
-    selectionCarryOver = 1, --how many of the best performers are carried over without modification
-    selectionRate = 0.2, --min: 0, max: 1
+    selectionType = "gaussian", --options: uniform, linear, gaussian, boltzmann 
+    selectionIsStochastic = true,
+    selectionCarryover = 1, --how many of the best performers are carried over without modification
+    selectionRate = 0.2, --min: 0, max: 1           boltzmann(init, shrinkrate)
+    selectionStdDev = 0.2, --min: 0, max: 1
     selectionShrink = 0.8, --min: 0, max: 1
     
     crossoverType = "uniform", --options: uniform
@@ -24,25 +26,62 @@ local genAlg = {
 function genAlg.run()
     local data = {
         topScores = {},
-        population = genAlg._randomPopulaton(),
-        
+        meanScores = {},
+        variances = {}     
     }
+    local population = genAlg._randomPopulaton()
     for genNum = 1, genAlg.generations, 1 do
         --rank creatures
-        for creatureNum = 1, genAlg.populationSize, 1 do
-            local creature = data.population[creatureNum]
-            creature.score = genAlg.fitnessFunction(creature.genes)
+        local scoreTotal = 0
+        for i = 1, genAlg.populationSize, 1 do
+            local creature = population[i]
+            local score = genAlg.fitnessFunction(creature.genes)
+            creature.score = score
+            scoreTotal = scoreTotal + score
         end
+        
+        --statistics
+        local average = scoreTotal / genAlg.populationSize
+        data.meanScores[genNum] = average
+        local totalSquaredDev = 0
+        for i = 1, genAlg.populationSize, 1 do
+            local creature = population[i]
+            local score = genAlg.fitnessFunction(creature.genes)
+            totalSquaredDev = totalSquaredDev + (score - average)^2
+        end
+        local variance = totalSquaredDev / genAlg.populationSize
+        data.variances[genNum] = variance
+        
         
         --sort creatures
-        genAlg._sortPopulation(data.population)
+        genAlg._quicksort(population)
+        local topScore = population[1]
+        data.topScores[genNum] = topScore
         
-        --select creatures
-        local parents = {}
-        for creatureNum = 1, genAlg.populationSize, 1 do
-            local creature = data.population[creatureNum]
-            
+        --elitist carryover
+        local nextGeneration = {}
+        for i = 1, genAlg.selectionCarryover, 1 do
+            table.insert(nextGeneration, population[i])
         end
+        
+        --select parents
+        local parents = {}
+        local numParents = math.ceil(genAlg.populationSize * genAlg.selectionRate)
+        if genAlg.selectionIsStochastic then
+            while #parents < numParents do
+                local creature = genAlg._selectCreature(population)
+                local selectionOdds = 1 - i / (genAlg.populationSize + 1)
+                if (math.random() < selectionOdds then
+                
+                end
+                
+            end
+        else
+            for i = 1, numParents, 1 do
+                parents[i] = population[i]
+            end
+        end
+        
     end
 end
 
