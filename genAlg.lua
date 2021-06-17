@@ -90,6 +90,41 @@ function genAlg._gaussian(mean, variance)
             math.cos(2 * math.pi * math.random()) + mean
 end
 
+function genAlg._triangular(a, b, c)
+  local f = (c - a)/(b - a)
+  local rand = math.random()
+  local x
+  if rand < f then
+    x = a + math.sqrt(rand*(b - a)*(c - a))
+  else
+    x = b - math.sqrt((1 - rand)*(b - a)*(b - c))
+  end
+  return x;
+end
+
+function genAlg._quicksort(population, left, right)
+    left = left or 1
+    right = right or #population
+    if right > left then
+        local x = population[right].score
+        local i = left - 1
+        for j = left, right - 1 do
+            if population[j].score > x then
+                i = i + 1
+                local temp = population[i]
+                population[i] = population[j]
+                population[j] = temp
+            end
+        end
+        local temp = population[i + 1]
+        population[i + 1] = population[right]
+        population[right] = temp
+        local pivotNewIndex = i + 1
+        genAlg._quicksort(population, left, pivotNewIndex - 1)
+        genAlg._quicksort(population, pivotNewIndex + 1, right)
+    end
+end
+
 function genAlg._randomPopulaton()
     local population = {}
     for i = 1, genAlg.populationSize, 1 do
