@@ -99,7 +99,7 @@ function genAlg._triangular(a, b, c)
   else
     x = b - math.sqrt((1 - rand)*(b - a)*(b - c))
   end
-  return x;
+  return x
 end
 
 function genAlg._quicksort(population, left, right)
