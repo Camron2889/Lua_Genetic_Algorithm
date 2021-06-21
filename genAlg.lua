@@ -5,8 +5,7 @@ local genAlg = {
     
     genomeSize = 3,
     geneDomain = { -1, 2 }, --{ x, width }
-    
-    mutationType = "gaussian", --options: gaussian, shrink 
+
     mutationRate = 1, --min: 0, max: 1
     mutationStdDev = 1,
     mutationShrink = 0.8, --min: 0, max: 1
@@ -64,6 +63,7 @@ function genAlg.run()
         --crossover
         for i = genAlg.selectionCarryover + 1, genAlg.populationSize, 1 do
             local newChromosome = genAlg._newChromosomeFromParents(parents)
+            genAlg._mutateChromosome(newChromosome)
             population[i].score = 0
             population[i].chromosome = newChromosome
         end
@@ -115,6 +115,14 @@ function genAlg._newChromosomeFromParents(parents)
   end
 
   return newChromosome
+end
+
+genAlg._mutateChromosome(chromosome)
+    for i = 1, #chromosome, 1 do
+        if math.random() < genAlg.mutationRate then
+            chromosome[i] = chromosome[i] + genAlg._gaussian(0, genAlg.mutationStdDev)
+        end
+    end
 end
 
 function genAlg._gaussian(mean, variance)
