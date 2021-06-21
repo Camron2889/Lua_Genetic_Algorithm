@@ -1,13 +1,13 @@
 local genAlg = {
     --Default Parameters
-    populationSize = 20,
+    populationSize = 100,
     generations = 10,
     
     genomeSize = 3,
     geneDomain = { -1, 2 }, --{ x, width }
 
-    mutationRate = 1, --min: 0, max: 1
-    mutationStdDev = 1,
+    mutationRate = 0.05, --min: 0, max: 1
+    mutationStdDev = 0.01,
     mutationShrink = 0.8, --min: 0, max: 1
     
     selectionType = "linear_ranked", --options: linear_ranked
@@ -33,7 +33,7 @@ function genAlg.run()
         local scoreTotal = 0
         for i = 1, genAlg.populationSize, 1 do
             local creature = population[i]
-            local score = genAlg.fitnessFunction(creature.genes)
+            local score = genAlg.fitnessFunction(creature.chromosome)
             creature.score = score
             scoreTotal = scoreTotal + score
         end
@@ -43,9 +43,7 @@ function genAlg.run()
         data.meanScores[genNum] = average
         local totalSquaredDev = 0
         for i = 1, genAlg.populationSize, 1 do
-            local creature = population[i]
-            local score = genAlg.fitnessFunction(creature.genes)
-            totalSquaredDev = totalSquaredDev + (score - average)^2
+            totalSquaredDev = totalSquaredDev + (population[i].score - average)^2
         end
         local variance = totalSquaredDev / genAlg.populationSize
         data.variances[genNum] = variance
@@ -117,7 +115,7 @@ function genAlg._newChromosomeFromParents(parents)
   return newChromosome
 end
 
-genAlg._mutateChromosome(chromosome)
+function genAlg._mutateChromosome(chromosome)
     for i = 1, #chromosome, 1 do
         if math.random() < genAlg.mutationRate then
             chromosome[i] = chromosome[i] + genAlg._gaussian(0, genAlg.mutationStdDev)
