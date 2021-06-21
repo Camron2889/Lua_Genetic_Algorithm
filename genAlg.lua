@@ -60,10 +60,12 @@ function genAlg.run()
         --select parents
         local parents = genAlg._selectParents(population, genAlg.selectionRate)
         
-        --elitist carryover
-        local nextGeneration = {}
-        for i = 1, genAlg.selectionCarryover, 1 do
-            table.insert(nextGeneration, population[i])
+
+        --crossover
+        for i = genAlg.selectionCarryover + 1, genAlg.populationSize, 1 do
+            local newChromosome = genAlg._newChromosomeFromParents(parents)
+            population[i].score = 0
+            population[i].chromosome = newChromosome
         end
     end
 end
@@ -83,14 +85,36 @@ function genAlg._selectParents(sortedPopulation, rate)
             local rand = math.floor(math.abs(genAlg._triangular(-n, n, 0)))
             if (rand <= n and selectionMatrix[rand] == 0) then
                 selectionMatrix[rand] = 1
-                table.insert(parents, population[rand])
+                table.insert(parents, sortedPopulation[rand])
             end
         end
     else
         for i = 1, numParents, 1 do
-            parents[i] = population[i]
+            parents[i] = sortedPopulation[i]
         end
     end
+    
+    return parents
+end
+
+function genAlg._newChromosomeFromParents(parents)
+  local p1 = math.random(#parents)
+  local p2 = math.random(#parents)
+  while p1 == p2 do
+    p2 = math.random(#parents)
+  end 
+  local newChromosome = {}
+  if genAlg.crossoverType == "uniform" then
+    for i = 1, genAlg.genomeSize, 1 do
+      if math.random() > 0.5 then
+        newChromosome[i] = parents[p1].chromosome[i]
+      else
+        newChromosome[i] = parents[p2].chromosome[i]
+      end
+    end
+  end
+
+  return newChromosome
 end
 
 function genAlg._gaussian(mean, variance)
@@ -140,7 +164,7 @@ function genAlg._randomPopulaton()
         for j = 1, genAlg.genomeSize, 1 do
             dna[j] = math.random() * genAlg.geneDomain[2] + genAlg.geneDomain[1]
         end
-        population[i] = { genes = dna, score = 0 }
+        population[i] = { chromosome = dna, score = 0 }
     end
     return population
 end
