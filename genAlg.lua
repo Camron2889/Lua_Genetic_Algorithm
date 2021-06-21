@@ -4,15 +4,14 @@ local genAlg = {
     generations = 10,
     
     genomeSize = 3,
-    geneDomain = { -1, 2 }, -- { x, width }
+    geneDomain = { -1, 2 }, --{ x, width }
     
     mutationType = "gaussian", --options: gaussian, shrink 
     mutationRate = 1, --min: 0, max: 1
     mutationStdDev = 1,
-    mutationShrink = 0.8 --min: 0, max: 1
+    mutationShrink = 0.8, --min: 0, max: 1
     
-    selectionType = "rank", "shrink" --options: rank, shrink
-    selectionDistribution = "gaussian", --options: none, triangular, gaussian
+    selectionType = "linear_ranked", --options: linear_ranked
     selectionCarryover = 1, --how many of the best performers are carried over without modification
     selectionRate = 0.2, --min: 0, max: 1
     selectionStdDev = 0.2, --min: 0, max: 1
@@ -58,30 +57,39 @@ function genAlg.run()
         local topScore = population[1]
         data.topScores[genNum] = topScore
         
+        --select parents
+        local parents = genAlg._selectParents(population, genAlg.selectionRate)
+        
         --elitist carryover
         local nextGeneration = {}
         for i = 1, genAlg.selectionCarryover, 1 do
             table.insert(nextGeneration, population[i])
         end
-        
-        --select parents
-        local parents = {}
-        local numParents = math.ceil(genAlg.populationSize * genAlg.selectionRate)
-        if genAlg.selectionIsStochastic then
-            while #parents < numParents do
-                local creature = genAlg._selectCreature(population)
-                local selectionOdds = 1 - i / (genAlg.populationSize + 1)
-                if (math.random() < selectionOdds then
-                
-                end
-                
-            end
-        else
-            for i = 1, numParents, 1 do
-                parents[i] = population[i]
+    end
+end
+
+function genAlg._selectParents(sortedPopulation, rate) 
+
+    local parents = {}
+    local numParents = math.ceil(#sortedPopulation * rate)
+    
+    if genAlg.selectionType == "linear_ranked" then
+        local selectionMatrix = {}
+        for i = 1, numParents, 1 do
+            selectionMatrix[i] = 0;
+        end
+        while #parents < numParents do
+            local n = genAlg.populationSize
+            local rand = math.floor(math.abs(genAlg._triangular(-n, n, 0)))
+            if (rand <= n and selectionMatrix[rand] == 0) then
+                selectionMatrix[rand] = 1
+                table.insert(parents, population[rand])
             end
         end
-        
+    else
+        for i = 1, numParents, 1 do
+            parents[i] = population[i]
+        end
     end
 end
 
@@ -128,7 +136,7 @@ end
 function genAlg._randomPopulaton()
     local population = {}
     for i = 1, genAlg.populationSize, 1 do
-        local _dna = {}
+        local dna = {}
         for j = 1, genAlg.genomeSize, 1 do
             dna[j] = math.random() * genAlg.geneDomain[2] + genAlg.geneDomain[1]
         end
